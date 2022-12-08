@@ -20,7 +20,7 @@ namespace LeftoverManagementApi.Controllers
         public IActionResult RegisterUser(string email, string userName, string password)
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
-            IEmailService emailSender = new EmailSender();
+            //IEmailService emailSender = new EmailSender();
             if (_context.LeftoverManagement_Users.Any(x=>x.Email==email))
             {
                 //here we will return something that will tell react app that this email already exists in the db
@@ -30,7 +30,7 @@ namespace LeftoverManagementApi.Controllers
             LeftoverManagement_Users user = new LeftoverManagement_Users() { Email = email,UserName= userName,Passowrd=pass};
             _context.LeftoverManagement_Users.Add(user);
             _context.SaveChanges();
-            emailSender.SendEmail("ahadullahkhokhar@gmail.com",emailSender.CreateEmail("12"));
+            //emailSender.SendEmail("ahadullahkhokhar@gmail.com",emailSender.CreateEmail("12"));
             
             return Ok(cryptoEngin.Decrypt(pass, cryptoEngin.key));
         }
