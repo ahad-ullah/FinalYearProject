@@ -3,7 +3,9 @@ using LeftoverManagementApi.Helpers;
 using LeftoverManagementApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace LeftoverManagementApi.Controllers
 {
@@ -21,18 +23,41 @@ namespace LeftoverManagementApi.Controllers
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
             IEmailService emailSender = new EmailSender();
-            if (_context.LeftoverManagement_Users.Any(x=>x.Email==email))
+            try
             {
-                //here we will return something that will tell react app that this email already exists in the db
-                return BadRequest();
+                if (_context.LeftoverManagement_Users.Any(x => x.Email == email))
+                {
+                    //here we will return something that will tell react app that this email already exists in the db
+                    return BadRequest("Username Already Exist");
+                }
+                var pass = cryptoEngin.Encrypt(password, cryptoEngin.key);
+                LeftoverManagement_Users user = new LeftoverManagement_Users() { Email = email, UserName = userName, Passowrd = pass };
+                _context.LeftoverManagement_Users.Add(user);
+                _context.SaveChanges();
             }
-            var pass = cryptoEngin.Encrypt(password, cryptoEngin.key);
-            LeftoverManagement_Users user = new LeftoverManagement_Users() { Email = email,UserName= userName,Passowrd=pass};
-            _context.LeftoverManagement_Users.Add(user);
-            _context.SaveChanges();
-            emailSender.SendEmail("ahadullahkhokhar@gmail.com",emailSender.CreateEmail("12"));
-            
-            return Ok(cryptoEngin.Decrypt(pass, cryptoEngin.key));
+            catch (Exception e)
+            {
+
+                return BadRequest(e.Message);
+            }
+            try
+            {
+                string token = EmailSender.CreateToken();
+                string verificationLink = @"https://localhost:7195/api/Signup?token=replaceToken".Replace("replaceToken", token);
+                emailSender.SendEmail("umaimafaisal700@gmail.com", emailSender.CreateEmail(verificationLink));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500,e.Message);
+            }
+
+            return Ok();
         }
+        [HttpGet]
+        public IActionResult VarifyEmail(string token)
+        {
+            return Ok("Verified");
+        }
+       
     }
 }
