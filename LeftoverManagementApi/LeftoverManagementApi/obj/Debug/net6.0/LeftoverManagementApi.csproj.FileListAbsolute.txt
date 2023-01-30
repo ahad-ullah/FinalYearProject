@@ -60,3 +60,13 @@ C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementA
 C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\MailKit.dll
 C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\MimeKit.dll
 C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\BouncyCastle.Crypto.dll
+C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\System.Web.Cors.dll
+C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\ahadu\source\FinalYearProject\LeftoverManagementApi\LeftoverManagementApi\bin\Debug\net6.0\System.Security.Permissions.dll

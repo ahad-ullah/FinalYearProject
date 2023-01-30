@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LeftoverManagementApi.Helpers
+namespace LeftoverManagementApi.Halpers
 {
     public class CryptoEngine : ICryptoGraphy
     {

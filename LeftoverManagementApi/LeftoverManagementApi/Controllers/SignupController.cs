@@ -1,5 +1,4 @@
 ﻿using LeftoverManagementApi.Halpers;
-using LeftoverManagementApi.Helpers;
 using LeftoverManagementApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,45 +18,60 @@ namespace LeftoverManagementApi.Controllers
             _context = context;
         }
         [HttpPost]
-        public IActionResult RegisterUser(string email, string userName, string password)
+        [Route("RegisterUser")]
+        public string RegisterUser([FromBody] LeftoverManagement_Users leftoverUser)
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
             IEmailService emailSender = new EmailSender();
             try
             {
-                if (_context.LeftoverManagement_Users.Any(x => x.Email == email))
+                if (_context.LeftoverManagement_Users.Any(x => x.Email == leftoverUser.Email))
                 {
                     //here we will return something that will tell react app that this email already exists in the db
-                    return BadRequest("Username Already Exist");
+                    return "User Already Exits";
                 }
-                var pass = cryptoEngin.Encrypt(password, cryptoEngin.key);
-                LeftoverManagement_Users user = new LeftoverManagement_Users() { Email = email, UserName = userName, Passowrd = pass };
-                _context.LeftoverManagement_Users.Add(user);
+                var pass = cryptoEngin.Encrypt(leftoverUser.Passowrd, cryptoEngin.key);
+                string token = EmailSender.CreateToken();
+                leftoverUser.Passowrd = pass;
+                leftoverUser.VarificationToken = token;
+                leftoverUser.TokenTime = DateTime.UtcNow.AddMinutes(20);
+                string verificationLink = @"https://localhost:7195/api/Signup?token=replaceToken".Replace("replaceToken", token);
+                emailSender.SendEmail("gonfreecss891@gmail.com", emailSender.CreateEmail(verificationLink));
+                _context.LeftoverManagement_Users.Add(leftoverUser);
                 _context.SaveChanges();
             }
             catch (Exception e)
             {
-
-                return BadRequest(e.Message);
+                return e.Message;
             }
+
+            return "Data Saved.";
+        }
+        [HttpGet]
+        public string VarifyEmail(string token)
+        {
             try
             {
-                string token = EmailSender.CreateToken();
-                string verificationLink = @"https://localhost:7195/api/Signup?token=replaceToken".Replace("replaceToken", token);
-                emailSender.SendEmail("umaimafaisal700@gmail.com", emailSender.CreateEmail(verificationLink));
+                if (_context.LeftoverManagement_Users.Any(x => x.VarificationToken == token))
+                {
+
+                    var user = _context.LeftoverManagement_Users.Where(x => x.VarificationToken == token).FirstOrDefault();
+                    if (user!=null && user.TokenTime <= DateTime.UtcNow)
+                    {
+                        user.EmailVarification = true;
+                        user.VarificationToken = "";
+                        _context.LeftoverManagement_Users.Update(user);
+                        return "Email verified";
+                    }
+                    return "Token Expired";
+                }
+                return "Token Not Valid";
             }
             catch (Exception e)
             {
-                return StatusCode(500,e.Message);
+                return e.Message;
             }
-
-            return Ok();
         }
-        [HttpGet]
-        public IActionResult VarifyEmail(string token)
-        {
-            return Ok("Verified");
-        }
-       
     }
+
 }

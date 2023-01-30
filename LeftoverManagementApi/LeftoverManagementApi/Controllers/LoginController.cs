@@ -1,9 +1,7 @@
 ﻿using LeftoverManagementApi.Halpers;
-using LeftoverManagementApi.Helpers;
 using LeftoverManagementApi.Models;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LeftoverManagementApi.Controllers
 {
@@ -12,32 +10,52 @@ namespace LeftoverManagementApi.Controllers
     public class LoginController : ControllerBase
     {
         private ApplicationDbContext _context;
-        public LoginController(ApplicationDbContext context)
+        private readonly JwtHandler jwtHandler;
+
+        public LoginController(ApplicationDbContext context, JwtHandler jwtHandler)
         {
             _context = context;
+            this.jwtHandler = jwtHandler;
         }
         [HttpPost]
-        public IActionResult Login(string email, string password)
+        [Route("Login")]
+        [AllowAnonymous]
+        public string Login([FromBody] LoginModel loginUser)
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
-            var user = _context.LeftoverManagement_Users.Where(x=>x.Email== email).FirstOrDefault();
-            if (user!=null)
+            var user = _context.LeftoverManagement_Users.Where(x => x.Email == loginUser.email).FirstOrDefault();
+            try
             {
-                string pass = cryptoEngin.Decrypt(user.Passowrd, cryptoEngin.key);
-                if (password==pass)
+                if (user != null)
                 {
-                    return Ok();
+                    string pass = cryptoEngin.Decrypt(user.Passowrd, cryptoEngin.key);
+                    if (loginUser.password == pass)
+                    {
+                        return jwtHandler.GenerateToke(user);
+                    }
+                    else
+                    {
+                        return "User Name or password doesn't match.";
+                    }
                 }
                 else
                 {
-                    return BadRequest("User doesn't exist");
+                    return "User Doesn't exist";
                 }
             }
-            else
+            catch (Exception e)
             {
-                return BadRequest("User Doesn't exist");
+                return e.Message;
             }
-         }
+        }
+        [Route("GetUser")]
+        [HttpGet]
+        [Authorize]
+        public List<LeftoverManagement_Users> GetLeftoverManagementUsers()
+        {
+            var list = _context.LeftoverManagement_Users.ToList();
+            return list;
+        }
 
     }
 }
