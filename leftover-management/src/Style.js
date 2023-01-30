@@ -59,7 +59,7 @@ text-align: center;
 
 export const Title = styled.h2`
 font-weight: bold;
-font-size: 25px;
+font-size: 20px;
 align-items: center;
 justify-content: center;
 `;
@@ -93,6 +93,8 @@ export const Button = styled.button`
    }
 `;
 export const GhostButton = styled(Button)`
+
+align-items: center;
 background-color: transparent;
 border-color: #ffffff;
 `;

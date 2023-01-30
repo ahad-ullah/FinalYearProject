@@ -1,0 +1,133 @@
+.team-row{
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+    justify-content: center;
+}
+.team-column{
+    position: relative;
+    width: 100%;
+    padding: 15px;
+    flex: 0 0 100%;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    hyphens: manual;
+}
+.team{
+    margin-bottom:30px ;
+}
+.team .team-img{
+    position: relative;
+    font-size: 0;
+    text-align: center;
+}
+.team .team-img img{
+    width: 160px;
+    height: auto;
+    border-radius: 100%;
+    border: 20px solid #f3f4fa;
+}
+
+.team .team-content{
+    padding: 80px 20px 20px 20px;
+    margin-top: -80px;
+    text-align: center;
+    background: #f3f4fa;
+    border-radius: 10px;
+}
+.team .team-content h2{
+font-size: 25px;
+font-weight: 400;
+letter-spacing: 2px;
+}
+.team .team-content h3{
+    font-size: 16px;
+    font-weight: 300;
+}
+.team .team-content h4{
+    font-size: 16px;
+font-weight: 300;
+letter-spacing: 1px;
+font-style: italic;
+margin-bottom: 0;
+}
+.team .team-content p{
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+}
+.team .team-social{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 35px;
+    top: 0;
+    left:0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, .6);
+    transition: all .3s;
+    font-size: 0;
+    z-index: 1;
+    opacity: 0;
+}
+.team:hover .team-social{
+    opacity: 1;
+}
+.team .team-social a{
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin-right:5px ;
+    padding: 11px 0 10px 0;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 16px;
+    text-align: center;
+    color: #ffffff;
+    border-radius: 10px;
+    transition: all .3s;
+    margin-top: 50px;
+}
+.team .team-social a.social-tw{
+    background: #00acee;
+}
+.team .team-social a.social-fb{
+    background: #3b5998;
+}
+.team .team-social a.social-li{
+    background: #0e76a8;
+}
+.team .team-social a.social-in{
+    background: rgb(228, 64, 95)
+}
+.team .team-social a:last-child{
+    margin-right: 0;
+}
+.team:hover .team-social a{
+    margin-top: 0;
+}
+.team .team-social a:hover{
+    background: linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593);
+}
+
+
+/* Mobile Responsive */
+
+@media (min-width: 576px){
+    .team-column{
+        max-width: 50%;
+    }
+}
+@media (min-width: 768px){
+    .team-column{
+        max-width: 33.333333%;
+    }
+}
+@media (min-width: 992px){
+    .team-column{
+        max-width: 33.333333%;
+    }
+}

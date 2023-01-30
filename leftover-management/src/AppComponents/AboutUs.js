@@ -1,6 +1,6 @@
 import React from 'react'
 import './Signup1.css';
-import vector from "./../Images/vector.png"
+
 function AboutUs() {
   return (
     <>
@@ -15,7 +15,7 @@ function AboutUs() {
         </p>
       </div>
       <div className="col-lg-6 d-none d-lg-block">
-        <img src={vector} className="img-fluid"/>
+        
     </div>
     </div>
   </div>
