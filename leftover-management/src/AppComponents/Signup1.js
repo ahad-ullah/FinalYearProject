@@ -5,10 +5,31 @@ import Footer from './Footer';
 import vector from "./../images/signupimage.jpg" ;
 import Googlelogin from './Googlelogin';
 import Navbar from './Navbar.js';
+import axios from 'axios';
+import { Navigate } from 'react-router-dom';
 
 
 function Signup1() {
     const [signIn, toggle] = React.useState(true);
+    const [email,setEmail] = React.useState("");
+    const [name,setName] = React.useState("");
+    const [password,setPassword] = React.useState("");
+    const [confirmPassword,setConfirmPassword] = React.useState("");
+
+    const signUp = ()=>{
+        const data = {
+            email:email,
+            password:password,
+            fullName:name
+        };
+        const url = 'https://localhost:7195/api/Accounts/RegisterUser';
+        debugger;
+        axios.post(url,data).then(result=>{
+            alert(result.data);
+          }).catch(error=>{
+            console.log(error);
+          });
+    }
     return(
         <>
         
@@ -20,11 +41,11 @@ function Signup1() {
             <Components.SignUpContainer signinIn={signIn}>
                 <Components.Form>
                     <Components.Title style={{color:'black',}}>Sign Up as Donor</Components.Title>
-                    <Components.Input type='text' placeholder='Name' />
-                    <Components.Input type='email' placeholder='Email' />
-                    <Components.Input type='password' placeholder='Password' />
-                    <Components.Input type='password' placeholder='Confirm Password' />
-                    <Components.Button style={{background: 'linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)' , color:'white',}} >Sign Up</Components.Button>
+                    <Components.Input type='text' placeholder='Name' onChange={(e)=>{setName(e.target.value)}} />
+                    <Components.Input type='email' placeholder='Email' onChange={(e)=>{setEmail(e.target.value)}}/>
+                    <Components.Input type='password' placeholder='Password' onChange={(e)=>{setPassword(e.target.value)}}/>
+                    <Components.Input type='password' placeholder='Confirm Password' onChange={(e)=>{setConfirmPassword(e.target.value)}}/>
+                    <Components.Button style={{background: 'linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)' , color:'white',}} onClick={signUp} >Sign Up</Components.Button>
                     <div className='mt-3'> <Googlelogin ></Googlelogin> </div>
                     
                 </Components.Form>

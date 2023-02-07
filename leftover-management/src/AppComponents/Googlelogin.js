@@ -21,11 +21,14 @@ const onSuccess = (res) => {
   const data = {
     Email: res.profileObj.email,
     UserName: res.profileObj.name,
-    GoogleID: res.profileObj.googleId
+    GoogleID: res.profileObj.googleId,
   };
-  const url = 'https://localhost:7195/api/Signup/RegisterUser'
+  debugger;
+  const url = 'https://localhost:7195/api/Accounts/RegisterUser'
   axios.post(url,data).then(result=>{
     alert(result.data);
+  }).catch(error=>{
+    console.log(error.data)
   });
   console.log(data);
 };

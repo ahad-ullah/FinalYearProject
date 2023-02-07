@@ -17,31 +17,31 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate()
-    const  SignUpfunction = (e) =>
-    {
-        e.preventDefault();
-        window.location.href='http://localhost:3000/?#/SignUp1' ;
-    }
+    // const  SignUpfunction = (e) =>
+    // {
+    //     e.preventDefault();
+    //     window.location.href='http://localhost:3000/?#/SignUp1' ;
+    // }
 
-    const  Loginfunction = (e) =>
-    {
+    // const  Loginfunction = (e) =>
+    // {
       
-      console.log(email,password)
-      axios.post("https://localhost:7195/api/Login/Login", {
-        email: email,
-        password : password
-      }).then(result=>{
-        debugger;
-        console.log(result.data)
-        //alert('success')
-        localStorage.setItem('token',result.data)
-        navigate('/Donee')
-      }).catch(error =>{
-        console.log(error)
-        alert('Please Enter Correct User name and Password')
-      })
+    //   console.log(email,password)
+    //   axios.post("https://localhost:7195/api/Login/Login", {
+    //     email: email,
+    //     password : password
+    //   }).then(result=>{
+    //     debugger;
+    //     console.log(result.data)
+    //     //alert('success')
+    //     localStorage.setItem('token',result.data)
+    //     navigate('/Donee')
+    //   }).catch(error =>{
+    //     console.log(error)
+    //     alert('Please Enter Correct User name and Password')
+    //   })
       
-    }
+    // }
 
    {/* const  handleApi = (e) =>
     {
@@ -55,7 +55,8 @@ function Login() {
     } */}
   return (
      <>
-   <Navbar></Navbar>
+   <Navbar/>
+   {/* </Navbar> */}
    
     <div className='row'  style={{ backgroundColor:'#EDEDED' }}>
 
@@ -68,7 +69,7 @@ function Login() {
     <h3 style={{alignContent:'center'}}>Login</h3>
 
     <p>Please login to your account</p>
-    <form onSubmit={Loginfunction}>
+    <form >
 <div className="form-outline">
   <input type="email" id="Email" className="form-control mb-4" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" required />
 </div>
@@ -92,7 +93,7 @@ function Login() {
                     <p className="mb-2 me-2 mt-4 ">Don't have an account?</p>
                     </div>
                     <div className="text-center">
-                    <button type="button" style={{ width: '50%'}} onClick={SignUpfunction} className="btn btn-outline-danger">Create new</button>
+                    <button type="button" style={{ width: '50%'}} className="btn btn-outline-danger">Create new</button>
                     </div>
 
 </MDBContainer>
@@ -105,4 +106,4 @@ function Login() {
   ) ;
 }
 
-export default Login ;
+export default Login;
