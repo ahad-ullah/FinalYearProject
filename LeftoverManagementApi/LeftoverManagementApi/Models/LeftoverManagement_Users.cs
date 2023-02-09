@@ -7,9 +7,7 @@ namespace LeftoverManagementApi.Models
         [Key]
         public int Id { get; set; }
         public string? FullName { get; set; }
-        [Required]
         public string Email { get; set; }
-        [Required]
         public string? Passowrd { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Address { get; set; }

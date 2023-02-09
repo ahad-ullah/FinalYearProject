@@ -1,6 +1,6 @@
 import React from 'react'
 import './Login.css';
-import { Link , useNavigate } from 'react-router-dom' ;
+import { json, Link , useNavigate } from 'react-router-dom' ;
 import Googlelogin from './Googlelogin';
 import vector from "./../images/loginimg.jpg" ;
 import Navbar from './Navbar';
@@ -23,25 +23,35 @@ function Login() {
     //     window.location.href='http://localhost:3000/?#/SignUp1' ;
     // }
 
-    // const  Loginfunction = (e) =>
-    // {
+    const  Loginfunction = () =>
+    {
+      let data = JSON.stringify({
+        email: email,
+        password: password
+      })
+      var config = {
+        method: 'post',
+      maxBodyLength: Infinity,
+        url: 'https://localhost:7195/api/Accounts/Login',
+        headers: { 
+          'accept': 'text/plain', 
+          'Content-Type': 'application/json'
+        },
+        data : data
+      };
       
-    //   console.log(email,password)
-    //   axios.post("https://localhost:7195/api/Login/Login", {
-    //     email: email,
-    //     password : password
-    //   }).then(result=>{
-    //     debugger;
-    //     console.log(result.data)
-    //     //alert('success')
-    //     localStorage.setItem('token',result.data)
-    //     navigate('/Donee')
-    //   }).catch(error =>{
-    //     console.log(error)
-    //     alert('Please Enter Correct User name and Password')
-    //   })
+      axios(config)
+      .then((response)=> {
+        alert(response.data);
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error)=> {
+        alert(error.data);
+        console.log(error);
+      });
       
-    // }
+      
+    }
 
    {/* const  handleApi = (e) =>
     {
@@ -80,7 +90,7 @@ function Login() {
 
 
 <div className="text-center">
-<button  name="Login" type="submit" style={{border:'none' , color:'white' ,background: 'linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)' ,width: '200px', height:'40px'}}>Login</button>
+<button  name="Login" type="submit" onClick={Loginfunction} style={{border:'none' , color:'white' ,background: 'linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)' ,width: '200px', height:'40px'}}>Login</button>
 
                     <br></br>
                     <Link className="nav-link px-3 me-2 mt-3 mb-3"  to="/Forgotpassword">Forgot password? </Link>

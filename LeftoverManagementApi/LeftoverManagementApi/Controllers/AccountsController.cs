@@ -1,15 +1,16 @@
-﻿using LeftoverManagementApi.Halpers;
+﻿using LeftoverManagementApi.ApiModels;
+using LeftoverManagementApi.Halpers;
 using LeftoverManagementApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Org.BouncyCastle.Asn1.X509;
 
 namespace LeftoverManagementApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
     public class AccountsController : ControllerBase
     {
         private ApplicationDbContext _context;
@@ -20,6 +21,17 @@ namespace LeftoverManagementApi.Controllers
             this.jwtHandler = jwtHandler;
         }
 
+        [HttpGet]
+        [Authorize]
+        [Route("getUser")]
+        public string getuser(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return "no user found";
+            }
+            return "Hello " + email;
+        }
         //
         /// <summary>
         /// Login endpoint to get user loged into the application
@@ -47,10 +59,7 @@ namespace LeftoverManagementApi.Controllers
                         return "User Name or password doesn't match.";
                     }
                 }
-                else
-                {
                     return "User Doesn't exist";
-                }
             }
             catch (Exception e)
             {
@@ -65,24 +74,27 @@ namespace LeftoverManagementApi.Controllers
         /// <returns>Returns the status of the registration procedure.</returns>
         [HttpPost]
         [Route("RegisterUser")]
-        public string RegisterUser([FromBody] LeftoverManagement_Users leftoverUser)
+        public string RegisterUser([FromBody] ShareKhairahUser shareKhairahUser)
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
             IEmailService emailSender = new EmailSender();
+            LeftoverManagement_Users leftoverUser = new LeftoverManagement_Users();
             try
             {
-                if (_context.LeftoverManagement_Users.Any(x => x.Email == leftoverUser.Email))
+                if (_context.LeftoverManagement_Users.Any(x => x.Email == shareKhairahUser.email))
                 {
                     //here we will return something that will tell react app that this email already exists in the db
                     return "User Already Exits";
                 }
-                var pass = cryptoEngin.Encrypt(leftoverUser.Passowrd, cryptoEngin.key);
+                var pass = cryptoEngin.Encrypt(shareKhairahUser.password, cryptoEngin.key);
                 string token = EmailSender.CreateToken();
+                leftoverUser.FullName = shareKhairahUser.fullName;
+                leftoverUser.Email = shareKhairahUser.email;
                 leftoverUser.Passowrd = pass;
                 leftoverUser.VarificationToken = token;
                 leftoverUser.TokenTime = DateTime.UtcNow.AddMinutes(20);
                 string verificationLink = @"https://localhost:7195/api/Signup/VerifyToken?token=replaceToken".Replace("replaceToken", token);
-                emailSender.SendEmail(leftoverUser.Email, emailSender.CreateEmail(verificationLink));
+                emailSender.SendEmail(shareKhairahUser.email, emailSender.CreateEmail(verificationLink));
                 _context.LeftoverManagement_Users.Add(leftoverUser);
                 _context.SaveChanges();
             }
@@ -91,7 +103,7 @@ namespace LeftoverManagementApi.Controllers
                 return e.Message;
             }
 
-            return "Data Saved.";
+            return "User Registered Successfully";
         }
         /// <summary>
         /// Verifies the emial that is registered in the above function.
@@ -147,7 +159,6 @@ namespace LeftoverManagementApi.Controllers
                     string verificationLink = @"https://localhost:7195/api/Accounts/ResetPassword?token=replaceToken".Replace("replaceToken", token);
                     emailSender.SendEmail(email, emailSender.CreateEmail(verificationLink));
                     return "Password reset link sent to the entered email address";
-
                 }
                 return "User not found";
             }

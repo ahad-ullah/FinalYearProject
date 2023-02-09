@@ -18,20 +18,33 @@ useEffect(() => {
 });
 const onSuccess = (res) => {
   console.log('success:', res);
-  const data = {
+  let data =JSON.stringify( {
     Email: res.profileObj.email,
     UserName: res.profileObj.name,
     GoogleID: res.profileObj.googleId,
-  };
-  debugger;
-  const url = 'https://localhost:7195/api/Accounts/RegisterUser'
-  axios.post(url,data).then(result=>{
-    alert(result.data);
-  }).catch(error=>{
-    console.log(error.data)
+    passowrd:"ahad"
   });
-  console.log(data);
+  debugger;
+
+var config = {
+  method: 'post',
+maxBodyLength: Infinity,
+  url: 'https://localhost:7195/api/Accounts/RegisterUser',
+  headers: { 
+    'accept': 'text/plain', 
+    'Content-Type': 'application/json'
+  },
+  data : data
 };
+
+axios(config)
+.then(function (response) {
+  console.log(JSON.stringify(response.data));
+})
+.catch(function (error) {
+  console.log(error);
+});
+}
 
 const onFailure = (err) => {
     console.log('failed:', err);

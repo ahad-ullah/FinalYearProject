@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LeftoverManagementApi.Models
+namespace LeftoverManagementApi.ApiModels
 {
     public class LoginModel
     {
