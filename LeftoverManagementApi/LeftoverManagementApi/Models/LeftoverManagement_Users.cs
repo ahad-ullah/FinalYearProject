@@ -14,5 +14,6 @@ namespace LeftoverManagementApi.Models
         public DateTime? TokenTime { get; set; }
         public string? VarificationToken { get; set; }
         public bool EmailVarification { get; set; } = false;
+        public string? imagePath { get; set; }
     }
 }

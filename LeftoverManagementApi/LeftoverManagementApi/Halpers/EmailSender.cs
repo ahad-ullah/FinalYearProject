@@ -18,7 +18,7 @@ namespace LeftoverManagementApi.Halpers
             email.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = emailBody };
             using var smtp = new SmtpClient();
             smtp.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-            smtp.Authenticate("bitf19a508@pucit.edu.pk", "ezonofeqwzgmxbsq");
+            smtp.Authenticate("ahadullahmujahid@gmail.com", "xwjxjyaawjluyqep");
             smtp.Send(email);
             smtp.Disconnect(true);
         }

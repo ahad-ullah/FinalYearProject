@@ -2,6 +2,7 @@
 using LeftoverManagementApi.Halpers;
 using LeftoverManagementApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -15,24 +16,14 @@ namespace LeftoverManagementApi.Controllers
     {
         private ApplicationDbContext _context;
         private readonly JwtHandler jwtHandler;
-        public AccountsController(ApplicationDbContext context, JwtHandler jwtHandler)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public AccountsController(ApplicationDbContext context, JwtHandler jwtHandler, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.jwtHandler = jwtHandler;
+            _webHostEnvironment = webHostEnvironment;
         }
 
-        [HttpGet]
-        [Authorize]
-        [Route("getUser")]
-        public string getuser(string email)
-        {
-            if (string.IsNullOrEmpty(email))
-            {
-                return "no user found";
-            }
-            return "Hello " + email;
-        }
-        //
         /// <summary>
         /// Login endpoint to get user loged into the application
         /// </summary>
@@ -167,6 +158,36 @@ namespace LeftoverManagementApi.Controllers
 
                 return e.Message;
             }
+        }
+        /// <summary>
+        /// update the user profile
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        public string updateProfile()
+        {
+            try
+            {
+                var files = HttpContext.Request.Form.Files;
+                string webRootPath = _webHostEnvironment.WebRootPath;
+                string upload = webRootPath + WebConstants.ProfilePicPath;
+                string fileName = Guid.NewGuid().ToString();
+                string extension = Path.GetExtension(files[0].FileName);
+                //upload the file to the server this code actually copies the file from one location to a given location
+                using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
+                {
+                    //file in files[0] is going to be copied to server using file stream
+                    files[0].CopyTo(fileStream);
+                }
+            }
+            catch (Exception e)
+            {
+
+                return e.Message;
+            }
+            
+            return "";
         }
     }
 }
