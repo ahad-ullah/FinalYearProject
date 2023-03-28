@@ -3,14 +3,15 @@ import '.././css/bootstrap.min.css'
 import '.././css/bootstrap-icons.css'
 import '.././css/templatemo-kind-heart-charity.css'
 import logo from ".././images/logo.png"
-import { Link, useNavigate } from 'react-router-dom';
+import { Link , useNavigate} from 'react-router-dom' ;
 
 function Navbar() {
-  const navigate = useNavigate()
-  const Logout = (e) => {
-    localStorage.removeItem('token')
-    navigate("/login")
-  }
+    const navigate= useNavigate()
+    const  Logout = (e) =>
+    {
+       localStorage.removeItem('token')
+       navigate("/login")
+    }
   return (
     <div>
       <nav className="navbar navbar-expand-lg bg-light shadow-lg">
@@ -53,9 +54,9 @@ function Navbar() {
                   SignUp
                 </Link>
               </li>
-              <li style={{ margin: '0px' }}>
+              <li  style={ { margin :'0px'}}>
                 <button
-                  className="navbar-toggler"
+                  class="navbar-toggler"
                   type="button"
                   data-toggle="collapse"
                   data-target="#navbar-list-4"
@@ -81,7 +82,7 @@ function Navbar() {
                           src="https://s3.eu-central-1.amazonaws.com/bootstrapbaymisc/blog/24_days_bootstrap/fox.jpg"
                           width="40"
                           height="40"
-                          className="rounded-circle"
+                          class="rounded-circle"
                         />
                       </a>
                       <div

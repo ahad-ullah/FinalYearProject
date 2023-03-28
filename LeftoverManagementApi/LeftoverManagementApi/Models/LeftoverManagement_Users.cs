@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
+using System.ComponentModel.DataAnnotations;
 
 namespace LeftoverManagementApi.Models
 {
@@ -15,5 +16,6 @@ namespace LeftoverManagementApi.Models
         public string? VarificationToken { get; set; }
         public bool EmailVarification { get; set; } = false;
         public string? imagePath { get; set; }
+        public string? userRole { get; set; }
     }
 }

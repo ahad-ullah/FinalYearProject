@@ -2,7 +2,7 @@
 
 namespace LeftoverManagementApi.ApiModels
 {
-    public class ShareKhairahUser
+    public class Donee
     {
         [Required]
         public string fullName { get; set; }

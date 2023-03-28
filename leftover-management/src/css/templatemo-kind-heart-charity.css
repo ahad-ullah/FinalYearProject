@@ -765,7 +765,7 @@ strong {
   DONATE              
 -----------------------------------------*/
 .donate-section {
- background-image: url('../images/different-people-doing-volunteer-work.jpg'); 
+background-image: url('../images/different-people-doing-volunteer-work.jpg');  
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -1098,12 +1098,12 @@ blockquote::before {
 .input-group-file {
   background-color: var(--section-bg-color);
   box-shadow: none;
-  border: 0;
+  border-color: rgb(151, 150, 150);
   color: var(--p-color);
   margin-bottom: 24px;
   padding-top: 13px;
   padding-bottom: 13px;
-  outline: none;
+  
 }
 
 .custom-form .form-control:hover,

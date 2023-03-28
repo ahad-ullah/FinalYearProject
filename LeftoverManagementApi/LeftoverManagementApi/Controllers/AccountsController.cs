@@ -50,42 +50,44 @@ namespace LeftoverManagementApi.Controllers
                         return "User Name or password doesn't match.";
                     }
                 }
-                    return "User Doesn't exist";
+                return "User Doesn't exist";
             }
             catch (Exception e)
             {
                 return e.Message;
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="leftoverUser">.</param>
+        /// <returns>.</returns>
+
+
 
         /// <summary>
-        /// Registers a user to application
+        /// Registers a user as donee to application
         /// </summary>
-        /// <param name="leftoverUser">Takes information of the user who wants to register.</param>
-        /// <returns>Returns the status of the registration procedure.</returns>
+        /// <param name="donee">Takes information of the user who wants to register</param>
+        /// <returns>Returns the status of the registration procedure</returns>
         [HttpPost]
-        [Route("RegisterUser")]
-        public string RegisterUser([FromBody] ShareKhairahUser shareKhairahUser)
+        [Route("RegisterDonee")]
+        public string RegisterDonee([FromBody] Donee donee)
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
-            IEmailService emailSender = new EmailSender();
             LeftoverManagement_Users leftoverUser = new LeftoverManagement_Users();
             try
             {
-                if (_context.LeftoverManagement_Users.Any(x => x.Email == shareKhairahUser.email))
+                if (_context.LeftoverManagement_Users.Any(x => x.Email == donee.email))
                 {
                     //here we will return something that will tell react app that this email already exists in the db
                     return "User Already Exits";
                 }
-                var pass = cryptoEngin.Encrypt(shareKhairahUser.password, cryptoEngin.key);
-                string token = EmailSender.CreateToken();
-                leftoverUser.FullName = shareKhairahUser.fullName;
-                leftoverUser.Email = shareKhairahUser.email;
+                var pass = cryptoEngin.Encrypt(donee.password, cryptoEngin.key);
+                leftoverUser.FullName = donee.fullName;
+                leftoverUser.Email = donee.email;
                 leftoverUser.Passowrd = pass;
-                leftoverUser.VarificationToken = token;
-                leftoverUser.TokenTime = DateTime.UtcNow.AddMinutes(20);
-                string verificationLink = @"https://localhost:7195/api/Signup/VerifyToken?token=replaceToken".Replace("replaceToken", token);
-                emailSender.SendEmail(shareKhairahUser.email, emailSender.CreateEmail(verificationLink));
+                leftoverUser.userRole = "Donee";
                 _context.LeftoverManagement_Users.Add(leftoverUser);
                 _context.SaveChanges();
             }
@@ -96,6 +98,37 @@ namespace LeftoverManagementApi.Controllers
 
             return "User Registered Successfully";
         }
+
+        /// <summary>
+        /// send user an email verfication link to the registered email address.
+        /// </summary>
+        /// <param name="email">Email of the registered user</param>
+        /// <returns>status to the procedure</returns>
+        [HttpPost]
+        [Authorize]
+        [Route("EmailVarification")]
+        public string EmailVarify(string email)
+        {
+            try
+            {
+                var user = _context.LeftoverManagement_Users.Where(x => x.Email == email).FirstOrDefault();
+                if (user != null)
+                {
+
+                    IEmailService emailSender = new EmailSender();
+                    string token = EmailSender.CreateToken();
+                    user.VarificationToken = token;
+                    user.TokenTime = DateTime.UtcNow.AddMinutes(20);
+                    string verificationLink = @"https://localhost:7195/api/Accounts/VerifyToken?token=replaceToken".Replace("replaceToken", token);
+                    emailSender.SendEmail(email, emailSender.CreateEmail(verificationLink));
+                    _context.Update(user);
+                    _context.SaveChanges(true);
+                    return "Varification Link sent to your email address";
+                }
+                return "some error occured";
+            }
+            catch (Exception e) { return e.Message; }
+        }
         /// <summary>
         /// Verifies the emial that is registered in the above function.
         /// </summary>
@@ -103,7 +136,7 @@ namespace LeftoverManagementApi.Controllers
         /// <returns>Returns the status of the procedure.</returns>
         [HttpGet]
         [Route("VerifyToken")]
-        public string VarifyEmail(string token)
+        public IActionResult VarifyEmail(string token)
         {
             try
             {
@@ -117,15 +150,15 @@ namespace LeftoverManagementApi.Controllers
                         user.VarificationToken = "";
                         _context.LeftoverManagement_Users.Update(user);
                         _context.SaveChanges();
-                        return "Email verified";
+                        return Redirect("localhost:3000/login");
                     }
-                    return "Token Expired";
+                    return Redirect("localhost:3000/error");
                 }
-                return "Token Not Valid";
+                return Redirect("localhost:3000/error");
             }
             catch (Exception e)
             {
-                return e.Message;
+                return Redirect("localhost:3000/error");
             }
         }
         /// <summary>
@@ -139,12 +172,12 @@ namespace LeftoverManagementApi.Controllers
             try
             {
                 var user = _context.LeftoverManagement_Users.Where(x => x.Email == email).FirstOrDefault();
-                if (user!=null)
+                if (user != null)
                 {
                     IEmailService emailSender = new EmailSender();
                     string token = EmailSender.CreateToken();
-                    user.VarificationToken= token;
-                    user.TokenTime= DateTime.UtcNow.AddMinutes(10);
+                    user.VarificationToken = token;
+                    user.TokenTime = DateTime.UtcNow.AddMinutes(10);
                     _context.LeftoverManagement_Users.Update(user);
                     _context.SaveChanges();
                     string verificationLink = @"https://localhost:7195/api/Accounts/ResetPassword?token=replaceToken".Replace("replaceToken", token);
@@ -165,28 +198,41 @@ namespace LeftoverManagementApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public string updateProfile()
+        [Route("UpdateProfile")]
+        public string updateProfile(LeftoverManagement_Users user)
         {
             try
             {
+                var userToUpdate = _context.LeftoverManagement_Users.Where(x => x.Email == user.Email).FirstOrDefault();
                 var files = HttpContext.Request.Form.Files;
                 string webRootPath = _webHostEnvironment.WebRootPath;
                 string upload = webRootPath + WebConstants.ProfilePicPath;
                 string fileName = Guid.NewGuid().ToString();
                 string extension = Path.GetExtension(files[0].FileName);
                 //upload the file to the server this code actually copies the file from one location to a given location
-                using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
+                if (userToUpdate != null)
                 {
-                    //file in files[0] is going to be copied to server using file stream
-                    files[0].CopyTo(fileStream);
+                    using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
+                    {
+                        //file in files[0] is going to be copied to server using file stream
+                        files[0].CopyTo(fileStream);
+                    }
+                    userToUpdate.Address = user.Address;
+                    userToUpdate.FullName = user.FullName;
+                    userToUpdate.PhoneNumber = user.PhoneNumber;
+                    userToUpdate.imagePath = Path.Combine(upload,fileName + extension);
+                    _context.Update(userToUpdate);
+                    _context.SaveChanges();
+                    return "Profile Updated Successfully";
                 }
+                return "somme error occured";
             }
             catch (Exception e)
             {
 
                 return e.Message;
             }
-            
+
             return "";
         }
     }

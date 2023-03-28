@@ -3,12 +3,21 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
 import "./Userprofile.css";
+import { useState } from "react";
 
 function Userprofile({setIsOpen,isOpen}) {
+
+
+  const {image, setImage}= useState('')
+
+
+  const handlechange = (e)=>{
+    setImage(e.target.files[0])
+  }
   return (
     
     <div >
-      <Navbar></Navbar>
+      
       <Sidebar></Sidebar>
 <div id="userprof" className={`  mt-5  ${isOpen ? "profilex" : "profile"}`}  >
 <div className="row flex-lg-nowrap">
@@ -21,9 +30,7 @@ function Userprofile({setIsOpen,isOpen}) {
               <div className="row">
                 <div className="col-12 col-sm-auto mb-3">
                   <div className="mx-auto" style={{ width: '140px'}}>
-                    <div className="d-flex justify-content-center align-items-center rounded" style={{ height: '140px' , backgroundColor: 'rgb(233, 236, 239)'}}>
-                      <span style={{ color: 'rgb(166, 168, 170)', font : 'bold 8pt Arial'}}>140x140</span>
-                    </div>
+                   <input type="file" value={image} onChange={handlechange}></input>
                   </div>
                 </div>
                 <div className="col d-flex flex-column flex-sm-row justify-content-between mb-3">

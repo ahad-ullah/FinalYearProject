@@ -1,0 +1,11 @@
+.input-phone-number input:focus{
+    outline: none !important;
+    border:none !important;
+    box-shadow: none !important;
+}
+
+.input-phone-number input{
+    outline: none !important;
+    border:none !important;
+    box-shadow: none !important;
+}
