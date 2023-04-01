@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Hosting;
 using Org.BouncyCastle.Asn1.X509;
+using System.Reflection;
 
 namespace LeftoverManagementApi.Controllers
 {
@@ -32,7 +34,7 @@ namespace LeftoverManagementApi.Controllers
         [HttpPost]
         [Route("Login")]
         [AllowAnonymous]
-        public string Login([FromBody] LoginModel loginUser)
+        public IActionResult Login([FromBody] LoginModel loginUser)
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
             var user = _context.LeftoverManagement_Users.Where(x => x.Email == loginUser.email).FirstOrDefault();
@@ -43,27 +45,36 @@ namespace LeftoverManagementApi.Controllers
                     string pass = cryptoEngin.Decrypt(user.Passowrd, cryptoEngin.key);
                     if (loginUser.password == pass)
                     {
-                        return jwtHandler.GenerateToke(user);
+                        string token = jwtHandler.GenerateToke(user);
+                        string imageUrl = string.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, user.imagePath);
+                        var response = new
+                        {
+                            user = new {
+                            Email = user.Email,
+                            FullName = user.FullName,
+                            PhoneNumber = user.PhoneNumber,
+                            Address = user.Address,
+                            About = user.About,
+                            ImageName = user.imagePath,
+                            UserRole = user.userRole
+                            },
+                            token,
+                            imageUrl
+                        };
+                        return new JsonResult(response);
                     }
                     else
                     {
-                        return "User Name or password doesn't match.";
+                        return BadRequest("Password not Matched");
                     }
                 }
-                return "User Doesn't exist";
+                return BadRequest("User Doesn't exist");
             }
             catch (Exception e)
             {
-                return e.Message;
+                return BadRequest(e.Message);
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="leftoverUser">.</param>
-        /// <returns>.</returns>
-
-
 
         /// <summary>
         /// Registers a user as donee to application
@@ -197,43 +208,86 @@ namespace LeftoverManagementApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
         [Route("UpdateProfile")]
-        public string updateProfile(LeftoverManagement_Users user)
+        public async Task<IActionResult> updateProfile([FromForm] UpdateProfile profile)
         {
-            try
+            var userToUpdate = _context.LeftoverManagement_Users.Where(x => x.Email == profile.Email).FirstOrDefault();
+            if (userToUpdate != null)
             {
-                var userToUpdate = _context.LeftoverManagement_Users.Where(x => x.Email == user.Email).FirstOrDefault();
-                var files = HttpContext.Request.Form.Files;
-                string webRootPath = _webHostEnvironment.WebRootPath;
-                string upload = webRootPath + WebConstants.ProfilePicPath;
-                string fileName = Guid.NewGuid().ToString();
-                string extension = Path.GetExtension(files[0].FileName);
-                //upload the file to the server this code actually copies the file from one location to a given location
-                if (userToUpdate != null)
+                try
                 {
-                    using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
+                    if (profile.ImageFile != null)
                     {
-                        //file in files[0] is going to be copied to server using file stream
-                        files[0].CopyTo(fileStream);
+                        DeleteImage(userToUpdate.imagePath);
+                        userToUpdate.imagePath = await SaveImage(profile.ImageFile);
                     }
-                    userToUpdate.Address = user.Address;
-                    userToUpdate.FullName = user.FullName;
-                    userToUpdate.PhoneNumber = user.PhoneNumber;
-                    userToUpdate.imagePath = Path.Combine(upload,fileName + extension);
+                    //userToUpdate.Address = user.Address;
+                    //userToUpdate.FullName = user.FullName;
+                    //userToUpdate.PhoneNumber = user.PhoneNumber;
                     _context.Update(userToUpdate);
                     _context.SaveChanges();
-                    return "Profile Updated Successfully";
                 }
-                return "somme error occured";
+                catch (Exception e)
+                {
+
+                    return BadRequest(e.Message);
+                }
             }
-            catch (Exception e)
+
+            //try
+            //{
+            //    var userToUpdate = _context.LeftoverManagement_Users.Where(x => x.Email == user.Email).FirstOrDefault();
+            //    
+            //    string webRootPath = _webHostEnvironment.WebRootPath;
+            //    string upload = webRootPath + WebConstants.ProfilePicPath;
+            //    string fileName = Guid.NewGuid().ToString();
+            //    string extension = Path.GetExtension(files[0].FileName);
+            //    //upload the file to the server this code actually copies the file from one location to a given location
+            //    if (userToUpdate != null)
+            //    {
+            //        using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
+            //        {
+            //            //file in files[0] is going to be copied to server using file stream
+            //            files[0].CopyTo(fileStream);
+            //        }
+            //        userToUpdate.Address = user.Address;
+            //        userToUpdate.FullName = user.FullName;
+            //        userToUpdate.PhoneNumber = user.PhoneNumber;
+            //        userToUpdate.imagePath = Path.Combine(upload,fileName + extension);
+            //        _context.Update(userToUpdate);
+            //        _context.SaveChanges();
+            //        return "Profile Updated Successfully";
+            //    }
+            //    return "somme error occured";
+            //}
+            //catch (Exception e)
+            //{
+
+            //    return e.Message;
+            //}
+
+            return Ok("Success");
+        }
+
+        [NonAction]
+        public async Task<string> SaveImage(IFormFile imageFile)
+        {
+            string imageName = new String(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(' ', '-');
+            imageName = imageName + DateTime.Now.ToString("yymmssfff") + Path.GetExtension(imageFile.FileName);
+            var imagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Images", imageName);
+            using (var fileStream = new FileStream(imagePath, FileMode.Create))
             {
-
-                return e.Message;
+                await imageFile.CopyToAsync(fileStream);
             }
-
-            return "";
+            return imageName;
+        }
+        [NonAction]
+        public void DeleteImage(string imageName)
+        {
+            var imagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Images", imageName);
+            if (System.IO.File.Exists(imagePath))
+                System.IO.File.Delete(imagePath);
         }
     }
 }
+

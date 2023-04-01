@@ -2,12 +2,14 @@ using LeftoverManagementApi.Halpers;
 using LeftoverManagementApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Crypto.Tls;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
+IWebHostEnvironment env = builder.Environment;
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -48,7 +50,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, "images")),
+    RequestPath = "/images"
+});
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
