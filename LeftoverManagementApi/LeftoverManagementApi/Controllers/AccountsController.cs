@@ -65,25 +65,25 @@ namespace LeftoverManagementApi.Controllers
                     }
                     else
                     {
-                        return BadRequest("Password not Matched");
+                        return new JsonResult(new {error = "Password not Matched" });
                     }
                 }
-                return BadRequest("User Doesn't exist");
+                return new JsonResult(new { error = "User not found" });
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return new JsonResult(new { error = e.Message });
             }
         }
 
         /// <summary>
-        /// Registers a user as donee to application
+        /// Registers a user as doner to application
         /// </summary>
         /// <param name="donee">Takes information of the user who wants to register</param>
         /// <returns>Returns the status of the registration procedure</returns>
         [HttpPost]
-        [Route("RegisterDonee")]
-        public string RegisterDonee([FromBody] Donee donee)
+        [Route("RegisterDoner")]
+        public JsonResult RegisterDoner([FromBody] Donee donee)
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
             LeftoverManagement_Users leftoverUser = new LeftoverManagement_Users();
@@ -92,22 +92,53 @@ namespace LeftoverManagementApi.Controllers
                 if (_context.LeftoverManagement_Users.Any(x => x.Email == donee.email))
                 {
                     //here we will return something that will tell react app that this email already exists in the db
-                    return "User Already Exits";
+                    return new JsonResult(new { error = "User Already Exist" });
                 }
                 var pass = cryptoEngin.Encrypt(donee.password, cryptoEngin.key);
                 leftoverUser.FullName = donee.fullName;
                 leftoverUser.Email = donee.email;
                 leftoverUser.Passowrd = pass;
+                leftoverUser.RegistrationNumber = donee.RegistrationId;
                 leftoverUser.userRole = "Donee";
                 _context.LeftoverManagement_Users.Add(leftoverUser);
                 _context.SaveChanges();
             }
             catch (Exception e)
             {
-                return e.Message;
+                return new JsonResult(new { error = e.Message });
             }
 
-            return "User Registered Successfully";
+            return new JsonResult(new { success = "User Registered Successfully" });
+        }
+
+
+        [HttpPost]
+        [Route("RegisterDonee")]
+        public JsonResult RegisterDonee([FromBody] Doner doner)
+        {
+            ICryptoGraphy cryptoEngin = new CryptoEngine();
+            LeftoverManagement_Users leftoverUser = new LeftoverManagement_Users();
+            try
+            {
+                if (_context.LeftoverManagement_Users.Any(x => x.Email == doner.email))
+                {
+                    //here we will return something that will tell react app that this email already exists in the db
+                    return new JsonResult(new { error = "User Already Exist" });
+                }
+                var pass = cryptoEngin.Encrypt(doner.password, cryptoEngin.key);
+                leftoverUser.FullName = doner.fullName;
+                leftoverUser.Email = doner.email;
+                leftoverUser.Passowrd = pass;
+                leftoverUser.userRole = "Doner";
+                _context.LeftoverManagement_Users.Add(leftoverUser);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                return new JsonResult(new { error = e.Message });
+            }
+
+            return new JsonResult(new { success = "User Registered Successfully" });
         }
 
         /// <summary>
@@ -221,11 +252,12 @@ namespace LeftoverManagementApi.Controllers
                         DeleteImage(userToUpdate.imagePath);
                         userToUpdate.imagePath = await SaveImage(profile.ImageFile);
                     }
-                    //userToUpdate.Address = user.Address;
-                    //userToUpdate.FullName = user.FullName;
-                    //userToUpdate.PhoneNumber = user.PhoneNumber;
+                    userToUpdate.Address = profile.Address;
+                    userToUpdate.FullName = profile.FullName;
+                    userToUpdate.PhoneNumber = profile.PhoneNumber;
                     _context.Update(userToUpdate);
                     _context.SaveChanges();
+
                 }
                 catch (Exception e)
                 {

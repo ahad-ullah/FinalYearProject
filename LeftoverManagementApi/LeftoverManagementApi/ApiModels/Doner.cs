@@ -2,10 +2,9 @@
 
 namespace LeftoverManagementApi.ApiModels
 {
-    public class Donee
+    public class Doner
     {
-        [Required]
-        public string RegistrationId { get; set; }
+        
         [Required]
         public string fullName { get; set; }
         [Required]
@@ -13,6 +12,5 @@ namespace LeftoverManagementApi.ApiModels
         public string email { get; set; }
         [Required]
         public string password { get; set; }
-
     }
 }

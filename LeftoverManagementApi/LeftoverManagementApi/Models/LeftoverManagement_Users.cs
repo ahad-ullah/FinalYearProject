@@ -19,8 +19,7 @@ namespace LeftoverManagementApi.Models
         public bool EmailVarification { get; set; } = false;
         public string? imagePath { get; set; }
         public string? userRole { get; set; }
-        [NotMapped]
-        public IFormFile ImageFile { get; set; }
+        public string RegistrationNumber { get; set; }
         [NotMapped]
         public string ImageSrc { get; set; }
     }
