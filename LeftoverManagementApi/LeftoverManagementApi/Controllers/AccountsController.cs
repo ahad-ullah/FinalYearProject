@@ -50,16 +50,16 @@ namespace LeftoverManagementApi.Controllers
                         var response = new
                         {
                             user = new {
-                            Email = user.Email,
-                            FullName = user.FullName,
-                            PhoneNumber = user.PhoneNumber,
-                            Address = user.Address,
-                            About = user.About,
-                            ImageName = user.imagePath,
-                            UserRole = user.userRole
+                                Email = user.Email,
+                                FullName = user.FullName,
+                                PhoneNumber = user.PhoneNumber,
+                                Address = user.Address,
+                                About = user.About,
+                                ImageName = user.imagePath,
+                                UserRole = user.userRole,
+                                ImageUrl = imageUrl
                             },
-                            token,
-                            imageUrl
+                            token
                         };
                         return new JsonResult(response);
                     }
@@ -82,8 +82,8 @@ namespace LeftoverManagementApi.Controllers
         /// <param name="donee">Takes information of the user who wants to register</param>
         /// <returns>Returns the status of the registration procedure</returns>
         [HttpPost]
-        [Route("RegisterDoner")]
-        public JsonResult RegisterDoner([FromBody] Donee donee)
+        [Route("RegisterDonee")]
+        public JsonResult RegisterDonee([FromBody] Donee donee)
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
             LeftoverManagement_Users leftoverUser = new LeftoverManagement_Users();
@@ -100,6 +100,7 @@ namespace LeftoverManagementApi.Controllers
                 leftoverUser.Passowrd = pass;
                 leftoverUser.RegistrationNumber = donee.RegistrationId;
                 leftoverUser.userRole = "Donee";
+                leftoverUser.imagePath = "fox.jpg";
                 _context.LeftoverManagement_Users.Add(leftoverUser);
                 _context.SaveChanges();
             }
@@ -113,8 +114,8 @@ namespace LeftoverManagementApi.Controllers
 
 
         [HttpPost]
-        [Route("RegisterDonee")]
-        public JsonResult RegisterDonee([FromBody] Doner doner)
+        [Route("RegisterDoner")]
+        public JsonResult RegisterDoner([FromBody] Doner doner)
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
             LeftoverManagement_Users leftoverUser = new LeftoverManagement_Users();
@@ -130,6 +131,7 @@ namespace LeftoverManagementApi.Controllers
                 leftoverUser.Email = doner.email;
                 leftoverUser.Passowrd = pass;
                 leftoverUser.userRole = "Doner";
+                leftoverUser.imagePath = "fox.jpg";
                 _context.LeftoverManagement_Users.Add(leftoverUser);
                 _context.SaveChanges();
             }
@@ -249,12 +251,16 @@ namespace LeftoverManagementApi.Controllers
                 {
                     if (profile.ImageFile != null)
                     {
-                        DeleteImage(userToUpdate.imagePath);
+                        if (userToUpdate.imagePath!= "fox.jpg")
+                        {
+                            DeleteImage(userToUpdate.imagePath);
+                        }
                         userToUpdate.imagePath = await SaveImage(profile.ImageFile);
                     }
                     userToUpdate.Address = profile.Address;
                     userToUpdate.FullName = profile.FullName;
                     userToUpdate.PhoneNumber = profile.PhoneNumber;
+                    userToUpdate.About = profile.About;
                     _context.Update(userToUpdate);
                     _context.SaveChanges();
 
