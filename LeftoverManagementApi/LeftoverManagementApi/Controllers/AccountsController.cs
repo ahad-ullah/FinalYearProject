@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Hosting;
-using Org.BouncyCastle.Asn1.X509;
 using System.Reflection;
 
 namespace LeftoverManagementApi.Controllers
@@ -86,7 +85,7 @@ namespace LeftoverManagementApi.Controllers
         public JsonResult RegisterDonee([FromBody] Donee donee)
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
-            LeftoverManagement_Users leftoverUser = new LeftoverManagement_Users();
+            LeftoverManagement_User leftoverUser = new LeftoverManagement_User();
             try
             {
                 if (_context.LeftoverManagement_Users.Any(x => x.Email == donee.email))
@@ -118,7 +117,7 @@ namespace LeftoverManagementApi.Controllers
         public JsonResult RegisterDoner([FromBody] Doner doner)
         {
             ICryptoGraphy cryptoEngin = new CryptoEngine();
-            LeftoverManagement_Users leftoverUser = new LeftoverManagement_Users();
+            LeftoverManagement_User leftoverUser = new LeftoverManagement_User();
             try
             {
                 if (_context.LeftoverManagement_Users.Any(x => x.Email == doner.email))
@@ -263,48 +262,31 @@ namespace LeftoverManagementApi.Controllers
                     userToUpdate.About = profile.About;
                     _context.Update(userToUpdate);
                     _context.SaveChanges();
+                    string imageUrl = string.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, userToUpdate.imagePath);
 
+                    return new JsonResult (new
+                    {
+                        user = new
+                        {
+                            Email = userToUpdate.Email,
+                            FullName = userToUpdate.FullName,
+                            PhoneNumber = userToUpdate.PhoneNumber,
+                            Address = userToUpdate.Address,
+                            About = userToUpdate.About,
+                            ImageName = userToUpdate.imagePath,
+                            UserRole = userToUpdate.userRole,
+                            ImageUrl = imageUrl
+                        }
+                    });
                 }
                 catch (Exception e)
                 {
 
-                    return BadRequest(e.Message);
+                    return new JsonResult(new { error = e.Message });
                 }
             }
+            return new JsonResult(new { error = "Some error occured!" });
 
-            //try
-            //{
-            //    var userToUpdate = _context.LeftoverManagement_Users.Where(x => x.Email == user.Email).FirstOrDefault();
-            //    
-            //    string webRootPath = _webHostEnvironment.WebRootPath;
-            //    string upload = webRootPath + WebConstants.ProfilePicPath;
-            //    string fileName = Guid.NewGuid().ToString();
-            //    string extension = Path.GetExtension(files[0].FileName);
-            //    //upload the file to the server this code actually copies the file from one location to a given location
-            //    if (userToUpdate != null)
-            //    {
-            //        using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
-            //        {
-            //            //file in files[0] is going to be copied to server using file stream
-            //            files[0].CopyTo(fileStream);
-            //        }
-            //        userToUpdate.Address = user.Address;
-            //        userToUpdate.FullName = user.FullName;
-            //        userToUpdate.PhoneNumber = user.PhoneNumber;
-            //        userToUpdate.imagePath = Path.Combine(upload,fileName + extension);
-            //        _context.Update(userToUpdate);
-            //        _context.SaveChanges();
-            //        return "Profile Updated Successfully";
-            //    }
-            //    return "somme error occured";
-            //}
-            //catch (Exception e)
-            //{
-
-            //    return e.Message;
-            //}
-
-            return Ok("Success");
         }
 
         [NonAction]

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LeftoverManagementApi.Models
 {
-    public class LeftoverManagement_Users
+    public class LeftoverManagement_User
     {
         [Key]
         public int Id { get; set; }

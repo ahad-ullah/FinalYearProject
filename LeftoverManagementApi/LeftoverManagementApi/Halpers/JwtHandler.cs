@@ -14,7 +14,7 @@ namespace LeftoverManagementApi.Halpers
             this.key = key;
         }
 
-        public string GenerateToke(LeftoverManagement_Users user)
+        public string GenerateToke(LeftoverManagement_User user)
         {
             JwtSecurityTokenHandler tokenHandler= new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(key);
