@@ -34,6 +34,8 @@ builder.Services.AddAuthentication(x =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Jwt:SecretKey"])),
         ValidateIssuer = false,
         ValidateAudience = false,
+        ValidateLifetime = true,
+        RequireExpirationTime = true,
     };
 });
 

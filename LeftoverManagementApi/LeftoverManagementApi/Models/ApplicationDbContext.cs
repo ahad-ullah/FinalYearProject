@@ -10,5 +10,7 @@ namespace LeftoverManagementApi.Models
         }
         public DbSet<LeftoverManagement_User> LeftoverManagement_Users { get; set; }
         public DbSet<Record> Records { get; set; }
+        public DbSet<DonationsRequest> donationsRequests { get; set; }
+
     }
 }

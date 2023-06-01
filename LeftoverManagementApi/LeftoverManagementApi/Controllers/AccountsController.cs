@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Hosting;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace LeftoverManagementApi.Controllers
 {
@@ -150,8 +151,9 @@ namespace LeftoverManagementApi.Controllers
         [HttpPost]
         [Authorize]
         [Route("EmailVarification")]
-        public string EmailVarify(string email)
+        public string EmailVarify([FromBody]string email)
         {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
             try
             {
                 var user = _context.LeftoverManagement_Users.Where(x => x.Email == email).FirstOrDefault();
@@ -241,8 +243,10 @@ namespace LeftoverManagementApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("UpdateProfile")]
+        [Authorize(Roles ="Doner")]
         public async Task<IActionResult> updateProfile([FromForm] UpdateProfile profile)
         {
+            var role = User.FindFirst(ClaimTypes.Role);
             var userToUpdate = _context.LeftoverManagement_Users.Where(x => x.Email == profile.Email).FirstOrDefault();
             if (userToUpdate != null)
             {
